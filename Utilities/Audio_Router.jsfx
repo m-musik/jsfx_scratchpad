@@ -103,9 +103,6 @@ out_pin:Right Output
  == INIT SECTION
  =============================================================================*/
 @init
-// Reset the block counter to 0 every time playback starts
-blockCount = 0;
-
 // Set the gmem base offset
 GMEM_BASE_OFFSET = 2048;
 
@@ -119,9 +116,6 @@ GMEM_PER_CHANNEL = MAX_BUFFER_SIZE * NUM_CHANNELS;
  == BLOCK SECTION
  =============================================================================*/
 @block
-// On every new block, increment the counter by 1
-blockCount = blockCount + 1;
-
 // Calculate the gmem offset for the current router
 routerOffset = GMEM_BASE_OFFSET + (t_router_channel * GMEM_PER_CHANNEL);
 
