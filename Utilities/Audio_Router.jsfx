@@ -31,7 +31,7 @@ desc: Audio Router
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
-  
+
 */
 
 /*==============================================================================
@@ -122,9 +122,6 @@ GMEM_PER_CHANNEL = MAX_BUFFER_SIZE * NUM_CHANNELS;
 // On every new block, increment the counter by 1
 blockCount = blockCount + 1;
 
-// Get the number of samples in the current block
-newSamples = samplesblock;
-
 // Calculate the gmem offset for the current router
 routerOffset = GMEM_BASE_OFFSET + (t_router_channel * GMEM_PER_CHANNEL);
 
@@ -162,36 +159,3 @@ sampleCount = 0;
     sampleCount += 2;
   );
 );
-
-
-/*==============================================================================
- == GFX SECTION
- =============================================================================*/
-@gfx 300 150
-// Set the font and color
-gfx_setfont(1, "Arial", 14);
-gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 1;
-
-// Set the position of the block counter and print it
-gfx_x = 10; gfx_y = 10;
-gfx_printf("Counter: %d", blockCount);
-
-// Set the position of the sample block size and print it
-gfx_x = 10; gfx_y = 30;
-gfx_printf("newSamples: %d", newSamples);
-
-// Set the position of the slider value and print it
-gfx_x = 10; gfx_y = 50;
-gfx_printf("t_router_enabled: %d", t_router_enabled);
-
-// Set the position of the slider value and print it
-gfx_x = 10; gfx_y = 70;
-gfx_printf("t_router_type: %d", t_router_type);
-
-// Set the position of the slider value and print it
-gfx_x = 10; gfx_y = 90;
-gfx_printf("t_router_channel: %d", t_router_channel);
-
-// Set the position of the value and print it
-gfx_x = 10; gfx_y = 110;
-gfx_printf("routerOffset: %d", routerOffset);
