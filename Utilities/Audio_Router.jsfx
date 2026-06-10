@@ -1,0 +1,197 @@
+desc: Audio Router
+/*
+        
+        Author: mmusik
+
+       Version: 0.1
+
+   Description: Implements a simple gmem-based audio router that supports up to
+                16 sender/receiver pairs.
+
+  ==============================================================================
+
+  MIT License
+
+  Copyright (c) 2026 mmusik
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+  
+*/
+
+/*==============================================================================
+ == SLIDER DECLARATIONS
+ =============================================================================*/
+/*==============================================================================
+|        Name: t_router_enabled
+|
+|       Range: 0 to 1
+|
+| Description: Controls whether the current router instance is enabled.
+|
+|     Mapping: 0 = Disabled
+|              1 = Enabled
+==============================================================================*/
+slider1:t_router_enabled=0<0,1,1{Disabled,Enabled}>Router Enabled
+
+/*==============================================================================
+|        Name: t_router_type
+|
+|       Range: 0 to 1
+|
+| Description: Sets the functional type of the current router instance.
+|
+|     Mapping: 0 = Sender
+|              1 = Receiver
+==============================================================================*/
+slider2:t_router_type=0<0,1,1{Sender,Receiver}>Router Type
+
+/*==============================================================================
+|        Name: t_router_channel
+|
+|       Range: 0 to 15
+|
+| Description: Sets the channel of the current router instance.
+|
+|     Mapping:  0 = Channel 1
+|               1 = Channel 2
+|                     ...
+|              14 = Channel 15
+|              15 = Channel 16
+==============================================================================*/
+slider3:t_router_channel=0<1,4,1{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}>Router Channel
+
+/*==============================================================================
+|        Name: t_send_thru_enabled
+|
+|       Range: 0 to 1
+|
+| Description: Controls whether the output of the router instance is enabled
+|              when configured as a sender.
+|
+|     Mapping: 0 = Disabled
+|              1 = Enabled
+==============================================================================*/
+slider4:t_send_thru_enabled=1<0,1,1{Disabled,Enabled}>Send Thru Enabled
+
+
+/*==============================================================================
+ == I/O DECLARATION
+ =============================================================================*/
+in_pin:Left Input
+in_pin:Right Input
+out_pin:Left Output
+out_pin:Right Output
+
+
+/*==============================================================================
+ == INIT SECTION
+ =============================================================================*/
+@init
+// Reset the block counter to 0 every time playback starts
+blockCount = 0;
+
+// Set the gmem base offset
+GMEM_BASE_OFFSET = 2048;
+
+// Set max buffer size, number of channels, and allocation
+MAX_BUFFER_SIZE  = 2048;
+NUM_CHANNELS     = 2;
+GMEM_PER_CHANNEL = MAX_BUFFER_SIZE * NUM_CHANNELS;
+
+
+/*==============================================================================
+ == BLOCK SECTION
+ =============================================================================*/
+@block
+// On every new block, increment the counter by 1
+blockCount = blockCount + 1;
+
+// Get the number of samples in the current block
+newSamples = samplesblock;
+
+// Calculate the gmem offset for the current router
+routerOffset = GMEM_BASE_OFFSET + (t_router_channel * GMEM_PER_CHANNEL);
+
+// Reset the sample counter
+sampleCount = 0;
+
+
+/*==============================================================================
+ == SAMPLE SECTION
+ =============================================================================*/
+@sample
+// Check if router is enabled
+(t_router_enabled == 1) ? (
+  // Router is enabled; check if it's a sender or receiver
+  (t_router_type == 0) ? (
+    // Current router is a sender so store the current sample in gmem
+    gmem[routerOffset + sampleCount]     = spl0;
+    gmem[routerOffset + sampleCount + 1] = spl1;
+
+    // Increment the counter by 2 to move to the next gmem slot
+    sampleCount += 2;
+
+    // Check if sender thru path is disabled
+    (t_send_thru_enabled == 0) ? (
+      // Sender thru path is disabled so drive the output samples to 0
+      spl0 = 0.0;
+      spl1 = 0.0;
+    );
+  ) : (
+    // Current router is a receiver so read the current sample from gmem
+    spl0 = gmem[routerOffset + sampleCount];
+    spl1 = gmem[routerOffset + sampleCount + 1];
+
+    // Increment the counter by 2 to move to the next gmem slot
+    sampleCount += 2;
+  );
+);
+
+
+/*==============================================================================
+ == GFX SECTION
+ =============================================================================*/
+@gfx 300 150
+// Set the font and color
+gfx_setfont(1, "Arial", 14);
+gfx_r = 1; gfx_g = 1; gfx_b = 1; gfx_a = 1;
+
+// Set the position of the block counter and print it
+gfx_x = 10; gfx_y = 10;
+gfx_printf("Counter: %d", blockCount);
+
+// Set the position of the sample block size and print it
+gfx_x = 10; gfx_y = 30;
+gfx_printf("newSamples: %d", newSamples);
+
+// Set the position of the slider value and print it
+gfx_x = 10; gfx_y = 50;
+gfx_printf("t_router_enabled: %d", t_router_enabled);
+
+// Set the position of the slider value and print it
+gfx_x = 10; gfx_y = 70;
+gfx_printf("t_router_type: %d", t_router_type);
+
+// Set the position of the slider value and print it
+gfx_x = 10; gfx_y = 90;
+gfx_printf("t_router_channel: %d", t_router_channel);
+
+// Set the position of the value and print it
+gfx_x = 10; gfx_y = 110;
+gfx_printf("routerOffset: %d", routerOffset);
