@@ -104,7 +104,7 @@ out_pin:Right Output
  =============================================================================*/
 @init
 // Set the gmem base offset
-GMEM_BASE_OFFSET = 2048;
+GMEM_BASE_OFFSET = 16384;
 
 // Set max buffer size, number of channels, and allocation
 MAX_BUFFER_SIZE  = 2048;
