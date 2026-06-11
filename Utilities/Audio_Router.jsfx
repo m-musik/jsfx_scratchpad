@@ -26,7 +26,7 @@ desc: Audio Router
 
         Author: mmusik
 
-       Version: 0.1.1
+       Version: 0.1.?
 
    Description: Implements a simple gmem-based audio router that supports up to
                 16 sender/receiver pairs.
@@ -41,6 +41,10 @@ desc: Audio Router
            where receiver loops on a single sample block when sender is bypassed
            during playback. Adds controls to internally bypass sender and
            receiver output during playback without bypassing plugin.
+    0.1.?: Relocates gmem[] offset calculation to @slider section to eliminate
+           unnecessary arithmetic during each audio block. Simplifies heartbeat
+           to use numerical counter. Refactors constant names for consistency
+           and ease of debug.
 
   ==============================================================================
   gmem Mapping
@@ -132,7 +136,7 @@ slider2:t_router_type=0<0,1,1{Sender,Receiver}>Router Type
 |              14 = Channel 15
 |              15 = Channel 16
 ==============================================================================*/
-slider3:t_router_channel=0<1,4,1{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}>Router Channel
+slider3:t_router_channel=0<1,16,1{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}>Router Channel
 
 /*==============================================================================
 |        Name: t_send_bypass
