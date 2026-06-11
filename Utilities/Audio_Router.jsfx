@@ -208,30 +208,40 @@ TIMEOUT_THRESHOLD = 5;
 
 
 /*==============================================================================
+ == SLIDER SECTION
+ =============================================================================*/
+@slider
+// Calculate the current and last timestamp offsets based on the router's
+// current configuration
+TIMESTAMP_CURRENT_OFFSET = TIMESTAMP_BASE_OFFSET + (t_router_channel * 2);
+TIMESTAMP_LAST_OFFSET    = TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1;
+
+// Calculate the audio buffer offset based on the router's current configuration
+routerOffset = GMEM_BASE_OFFSET + (t_router_channel * GMEM_PER_CHANNEL);
+
+
+/*==============================================================================
  == BLOCK SECTION
  =============================================================================*/
 @block
-// Calculate the gmem offset for the current router
-routerOffset = GMEM_BASE_OFFSET + (t_router_channel * GMEM_PER_CHANNEL);
-
 // Reset the sample counter
 sampleCount = 0;
 
 // Check if the current router is a sender or receiver
 (t_router_type == 0) ? (
   // Current router is a sender so increment the timestamp in gmem
-  gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)] += 1;
+  gmem[TIMESTAMP_CURRENT_OFFSET] += 1;
 ) : (
   // Current router is a receiver so check if the current timestamp is different
   // from the last timestamp
-  (gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)] != gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1]) ? (
+  (gmem[TIMESTAMP_CURRENT_OFFSET] != gmem[TIMESTAMP_LAST_OFFSET]) ? (
     // Timestamps are different so set the router output enabled flag and clear
     // the timeout threshold counter
     router_output_enabled = 1;
     sender_timeout_count  = 0;
 
     // Set the last timestamp as the current timestamp
-    gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1] = gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)];
+    gmem[TIMESTAMP_LAST_OFFSET] = gmem[TIMESTAMP_CURRENT_OFFSET];
   ) : (
     // Timestamps are the same; check if the timeout counter has reached the
     // threshold value
