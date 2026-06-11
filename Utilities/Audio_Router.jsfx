@@ -200,7 +200,7 @@ NUM_PAIRS             = 16;
 TIMESTAMP_BASE_OFFSET = GMEM_BASE_OFFSET + (GMEM_PER_CHANNEL * NUM_PAIRS);
 
 // Initialize current and last timestamps to different values
-gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)]     = 0;
+gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)]     = -1;
 gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1] = 1;
 
 // Set the timeout threshold for sender bypass detection
@@ -219,8 +219,8 @@ sampleCount = 0;
 
 // Check if the current router is a sender or receiver
 (t_router_type == 0) ? (
-  // Current router is a sender so store the current timestamp in gmem
-  time_precise(gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)]);
+  // Current router is a sender so increment the timestamp in gmem
+  gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)] += 1;
 ) : (
   // Current router is a receiver so check if the current timestamp is different
   // from the last timestamp
