@@ -48,7 +48,7 @@ desc: Audio Router
 
     Offset | Name             | Description
     =======|==================|=================================================
-    16384  | GMEM_BASE_OFFSET | Base gmem offset for plugin.
+    16384  | K_GMEM_BASE_OFFSET | Base gmem offset for plugin.
     16384  | PAIR_BUFFER_0    | Sender/receiver buffer for Router channel 0.
     20480  | PAIR_BUFFER_1    | Sender/receiver buffer for Router channel 1.
     24576  | PAIR_BUFFER_2    | Sender/receiver buffer for Router channel 2.
@@ -188,23 +188,23 @@ out_pin:Right Output
  =============================================================================*/
 @init
 // Set the gmem base offset
-GMEM_BASE_OFFSET = 16384;
+K_GMEM_BASE_OFFSET = 16384;
 
 // Set max buffer size, number of channels, and allocation
-MAX_BUFFER_SIZE  = 2048;
-NUM_CHANNELS     = 2;
-GMEM_PER_CHANNEL = MAX_BUFFER_SIZE * NUM_CHANNELS;
+K_MAX_BUFFER_SIZE  = 2048;
+K_NUM_CHANNELS     = 2;
+K_GMEM_PER_CHANNEL = K_MAX_BUFFER_SIZE * K_NUM_CHANNELS;
 
 // Calculate the base offset for heartbeat timestamps
-NUM_PAIRS             = 16;
-TIMESTAMP_BASE_OFFSET = GMEM_BASE_OFFSET + (GMEM_PER_CHANNEL * NUM_PAIRS);
+K_NUM_PAIRS             = 16;
+K_TIMESTAMP_BASE_OFFSET = K_GMEM_BASE_OFFSET + (K_GMEM_PER_CHANNEL * K_NUM_PAIRS);
 
 // Initialize current and last timestamps to different values
-gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)]     = -1;
-gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1] = 1;
+gmem[K_TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)]     = -1;
+gmem[K_TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1] = 1;
 
 // Set the timeout threshold for sender bypass detection
-TIMEOUT_THRESHOLD = 5;
+K_TIMEOUT_THRESHOLD = 5;
 
 
 /*==============================================================================
@@ -213,11 +213,11 @@ TIMEOUT_THRESHOLD = 5;
 @slider
 // Calculate the current and last timestamp offsets based on the router's
 // current configuration
-TIMESTAMP_CURRENT_OFFSET = TIMESTAMP_BASE_OFFSET + (t_router_channel * 2);
-TIMESTAMP_LAST_OFFSET    = TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1;
+K_TIMESTAMP_CURRENT_OFFSET = K_TIMESTAMP_BASE_OFFSET + (t_router_channel * 2);
+K_TIMESTAMP_LAST_OFFSET    = K_TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1;
 
 // Calculate the audio buffer offset based on the router's current configuration
-routerOffset = GMEM_BASE_OFFSET + (t_router_channel * GMEM_PER_CHANNEL);
+K_AUDIO_BUFFER_OFFSET = K_GMEM_BASE_OFFSET + (t_router_channel * K_GMEM_PER_CHANNEL);
 
 
 /*==============================================================================
@@ -230,22 +230,22 @@ sampleCount = 0;
 // Check if the current router is a sender or receiver
 (t_router_type == 0) ? (
   // Current router is a sender so increment the timestamp in gmem
-  gmem[TIMESTAMP_CURRENT_OFFSET] += 1;
+  gmem[K_TIMESTAMP_CURRENT_OFFSET] += 1;
 ) : (
   // Current router is a receiver so check if the current timestamp is different
   // from the last timestamp
-  (gmem[TIMESTAMP_CURRENT_OFFSET] != gmem[TIMESTAMP_LAST_OFFSET]) ? (
+  (gmem[K_TIMESTAMP_CURRENT_OFFSET] != gmem[K_TIMESTAMP_LAST_OFFSET]) ? (
     // Timestamps are different so set the router output enabled flag and clear
     // the timeout threshold counter
     router_output_enabled = 1;
     sender_timeout_count  = 0;
 
     // Set the last timestamp as the current timestamp
-    gmem[TIMESTAMP_LAST_OFFSET] = gmem[TIMESTAMP_CURRENT_OFFSET];
+    gmem[K_TIMESTAMP_LAST_OFFSET] = gmem[K_TIMESTAMP_CURRENT_OFFSET];
   ) : (
     // Timestamps are the same; check if the timeout counter has reached the
     // threshold value
-    (sender_timeout_count == TIMEOUT_THRESHOLD) ? (
+    (sender_timeout_count == K_TIMEOUT_THRESHOLD) ? (
       // Timeout has reached its threshold; clear the router output enabled flag
       router_output_enabled = 0;
     ) : (
@@ -266,15 +266,15 @@ sampleCount = 0;
     // Current router is a sender so check if sender is bypassed
     (t_send_bypass == 1) ? (
       // Sender is enabled so store the current sample in gmem
-      gmem[routerOffset + sampleCount]     = spl0;
-      gmem[routerOffset + sampleCount + 1] = spl1;
+      gmem[K_AUDIO_BUFFER_OFFSET + sampleCount]     = spl0;
+      gmem[K_AUDIO_BUFFER_OFFSET + sampleCount + 1] = spl1;
 
       // Increment the counter by 2 to move to the next gmem slot
       sampleCount += 2;
     ) : (
       // Sender is bypassed so store 0 samples in gmem
-      gmem[routerOffset + sampleCount]     = 0.0;
-      gmem[routerOffset + sampleCount + 1] = 0.0;
+      gmem[K_AUDIO_BUFFER_OFFSET + sampleCount]     = 0.0;
+      gmem[K_AUDIO_BUFFER_OFFSET + sampleCount + 1] = 0.0;
 
       // Increment the counter by 2 to move to the next gmem slot
       sampleCount += 2;
@@ -290,8 +290,8 @@ sampleCount = 0;
     // Current router is a receiver; check if the output is enabled
     ((router_output_enabled == 1) && (t_receive_out_enabled == 1)) ? (
       // Output is enabled so read the current sample from gmem
-      spl0 = gmem[routerOffset + sampleCount];
-      spl1 = gmem[routerOffset + sampleCount + 1];
+      spl0 = gmem[K_AUDIO_BUFFER_OFFSET + sampleCount];
+      spl1 = gmem[K_AUDIO_BUFFER_OFFSET + sampleCount + 1];
 
       // Increment the counter by 2 to move to the next gmem slot
       sampleCount += 2;
@@ -305,8 +305,8 @@ sampleCount = 0;
   // Router is disabled; check if it's a sender
   (t_router_type == 0) ? (
     // Router is a sender but disabled so store 0 samples in gmem
-    gmem[routerOffset + sampleCount]     = 0.0;
-    gmem[routerOffset + sampleCount + 1] = 0.0;
+    gmem[K_AUDIO_BUFFER_OFFSET + sampleCount]     = 0.0;
+    gmem[K_AUDIO_BUFFER_OFFSET + sampleCount + 1] = 0.0;
 
     // Increment the counter by 2 to move to the next gmem slot
     sampleCount += 2;
