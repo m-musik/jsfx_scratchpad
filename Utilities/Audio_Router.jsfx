@@ -26,7 +26,7 @@ desc: Audio Router
 
         Author: mmusik
 
-       Version: 0.1.1
+       Version: 0.1.2
 
    Description: Implements a simple gmem-based audio router that supports up to
                 16 sender/receiver pairs.
@@ -41,48 +41,52 @@ desc: Audio Router
            where receiver loops on a single sample block when sender is bypassed
            during playback. Adds controls to internally bypass sender and
            receiver output during playback without bypassing plugin.
+    0.1.2: Relocates gmem[] offset calculation to @slider section to eliminate
+           unnecessary arithmetic during each audio block. Simplifies heartbeat
+           to use numerical counter. Refactors constant names for consistency
+           and ease of debug.
 
   ==============================================================================
   gmem Mapping
   ------------
 
-    Offset | Name             | Description
-    =======|==================|=================================================
-    16384  | GMEM_BASE_OFFSET | Base gmem offset for plugin.
-    16384  | PAIR_BUFFER_0    | Sender/receiver buffer for Router channel 0.
-    20480  | PAIR_BUFFER_1    | Sender/receiver buffer for Router channel 1.
-    24576  | PAIR_BUFFER_2    | Sender/receiver buffer for Router channel 2.
-    28672  | PAIR_BUFFER_3    | Sender/receiver buffer for Router channel 3.
-    32768  | PAIR_BUFFER_4    | Sender/receiver buffer for Router channel 4.
-    36864  | PAIR_BUFFER_5    | Sender/receiver buffer for Router channel 5.
-    40960  | PAIR_BUFFER_6    | Sender/receiver buffer for Router channel 6.
-    45056  | PAIR_BUFFER_7    | Sender/receiver buffer for Router channel 7.
-    49152  | PAIR_BUFFER_8    | Sender/receiver buffer for Router channel 8.
-    53248  | PAIR_BUFFER_9    | Sender/receiver buffer for Router channel 9.
-    57344  | PAIR_BUFFER_10   | Sender/receiver buffer for Router channel 10.
-    61440  | PAIR_BUFFER_11   | Sender/receiver buffer for Router channel 11.
-    65536  | PAIR_BUFFER_12   | Sender/receiver buffer for Router channel 12.
-    69632  | PAIR_BUFFER_13   | Sender/receiver buffer for Router channel 13.
-    73728  | PAIR_BUFFER_14   | Sender/receiver buffer for Router channel 14.
-    77824  | PAIR_BUFFER_15   | Sender/receiver buffer for Router channel 15.
-    81920  | TS_BASE_OFFSET   | Base gmem offset for heartbeat timestamps.
-    81920  | TS_BUFFER_0      | Current/last timestamp for Router channel 0.
-    81922  | TS_BUFFER_1      | Current/last timestamp for Router channel 1.
-    81924  | TS_BUFFER_2      | Current/last timestamp for Router channel 2.
-    81926  | TS_BUFFER_3      | Current/last timestamp for Router channel 3.
-    81928  | TS_BUFFER_4      | Current/last timestamp for Router channel 4.
-    81930  | TS_BUFFER_5      | Current/last timestamp for Router channel 5.
-    81932  | TS_BUFFER_6      | Current/last timestamp for Router channel 6.
-    81934  | TS_BUFFER_7      | Current/last timestamp for Router channel 7.
-    81936  | TS_BUFFER_8      | Current/last timestamp for Router channel 8.
-    81938  | TS_BUFFER_9      | Current/last timestamp for Router channel 9.
-    81940  | TS_BUFFER_10     | Current/last timestamp for Router channel 10.
-    81942  | TS_BUFFER_11     | Current/last timestamp for Router channel 11.
-    81944  | TS_BUFFER_12     | Current/last timestamp for Router channel 12.
-    81946  | TS_BUFFER_13     | Current/last timestamp for Router channel 13.
-    81948  | TS_BUFFER_14     | Current/last timestamp for Router channel 14.
-    81950  | TS_BUFFER_15     | Current/last timestamp for Router channel 15.
-    81951  | GMEM_END_OFFSET  | Final gmem offset used by plugin.
+    Offset | Name               | Description
+    =======|====================|===============================================
+    16384  | K_GMEM_BASE_OFFSET | Base gmem offset for plugin.
+    16384  | PAIR_BUFFER_0      | Sender/receiver buffer for Router channel 0.
+    20480  | PAIR_BUFFER_1      | Sender/receiver buffer for Router channel 1.
+    24576  | PAIR_BUFFER_2      | Sender/receiver buffer for Router channel 2.
+    28672  | PAIR_BUFFER_3      | Sender/receiver buffer for Router channel 3.
+    32768  | PAIR_BUFFER_4      | Sender/receiver buffer for Router channel 4.
+    36864  | PAIR_BUFFER_5      | Sender/receiver buffer for Router channel 5.
+    40960  | PAIR_BUFFER_6      | Sender/receiver buffer for Router channel 6.
+    45056  | PAIR_BUFFER_7      | Sender/receiver buffer for Router channel 7.
+    49152  | PAIR_BUFFER_8      | Sender/receiver buffer for Router channel 8.
+    53248  | PAIR_BUFFER_9      | Sender/receiver buffer for Router channel 9.
+    57344  | PAIR_BUFFER_10     | Sender/receiver buffer for Router channel 10.
+    61440  | PAIR_BUFFER_11     | Sender/receiver buffer for Router channel 11.
+    65536  | PAIR_BUFFER_12     | Sender/receiver buffer for Router channel 12.
+    69632  | PAIR_BUFFER_13     | Sender/receiver buffer for Router channel 13.
+    73728  | PAIR_BUFFER_14     | Sender/receiver buffer for Router channel 14.
+    77824  | PAIR_BUFFER_15     | Sender/receiver buffer for Router channel 15.
+    81920  | TS_BASE_OFFSET     | Base gmem offset for heartbeat timestamps.
+    81920  | TS_BUFFER_0        | Current/last timestamp for Router channel 0.
+    81922  | TS_BUFFER_1        | Current/last timestamp for Router channel 1.
+    81924  | TS_BUFFER_2        | Current/last timestamp for Router channel 2.
+    81926  | TS_BUFFER_3        | Current/last timestamp for Router channel 3.
+    81928  | TS_BUFFER_4        | Current/last timestamp for Router channel 4.
+    81930  | TS_BUFFER_5        | Current/last timestamp for Router channel 5.
+    81932  | TS_BUFFER_6        | Current/last timestamp for Router channel 6.
+    81934  | TS_BUFFER_7        | Current/last timestamp for Router channel 7.
+    81936  | TS_BUFFER_8        | Current/last timestamp for Router channel 8.
+    81938  | TS_BUFFER_9        | Current/last timestamp for Router channel 9.
+    81940  | TS_BUFFER_10       | Current/last timestamp for Router channel 10.
+    81942  | TS_BUFFER_11       | Current/last timestamp for Router channel 11.
+    81944  | TS_BUFFER_12       | Current/last timestamp for Router channel 12.
+    81946  | TS_BUFFER_13       | Current/last timestamp for Router channel 13.
+    81948  | TS_BUFFER_14       | Current/last timestamp for Router channel 14.
+    81950  | TS_BUFFER_15       | Current/last timestamp for Router channel 15.
+    81951  | GMEM_END_OFFSET    | Final gmem offset used by plugin.
   
 */
 
@@ -132,7 +136,7 @@ slider2:t_router_type=0<0,1,1{Sender,Receiver}>Router Type
 |              14 = Channel 15
 |              15 = Channel 16
 ==============================================================================*/
-slider3:t_router_channel=0<1,4,1{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}>Router Channel
+slider3:t_router_channel=0<1,16,1{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}>Router Channel
 
 /*==============================================================================
 |        Name: t_send_bypass
@@ -188,54 +192,64 @@ out_pin:Right Output
  =============================================================================*/
 @init
 // Set the gmem base offset
-GMEM_BASE_OFFSET = 16384;
+K_GMEM_BASE_OFFSET = 16384;
 
 // Set max buffer size, number of channels, and allocation
-MAX_BUFFER_SIZE  = 2048;
-NUM_CHANNELS     = 2;
-GMEM_PER_CHANNEL = MAX_BUFFER_SIZE * NUM_CHANNELS;
+K_MAX_BUFFER_SIZE  = 2048;
+K_NUM_CHANNELS     = 2;
+K_GMEM_PER_CHANNEL = K_MAX_BUFFER_SIZE * K_NUM_CHANNELS;
 
 // Calculate the base offset for heartbeat timestamps
-NUM_PAIRS             = 16;
-TIMESTAMP_BASE_OFFSET = GMEM_BASE_OFFSET + (GMEM_PER_CHANNEL * NUM_PAIRS);
+K_NUM_PAIRS             = 16;
+K_TIMESTAMP_BASE_OFFSET = K_GMEM_BASE_OFFSET + (K_GMEM_PER_CHANNEL * K_NUM_PAIRS);
 
 // Initialize current and last timestamps to different values
-gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)]     = 0;
-gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1] = 1;
+gmem[K_TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)]     = -1;
+gmem[K_TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1] = 1;
 
 // Set the timeout threshold for sender bypass detection
-TIMEOUT_THRESHOLD = 5;
+K_TIMEOUT_THRESHOLD = 5;
+
+
+/*==============================================================================
+ == SLIDER SECTION
+ =============================================================================*/
+@slider
+// Calculate the current and last timestamp offsets based on the router's
+// current configuration
+K_TIMESTAMP_CURRENT_OFFSET = K_TIMESTAMP_BASE_OFFSET + (t_router_channel * 2);
+K_TIMESTAMP_LAST_OFFSET    = K_TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1;
+
+// Calculate the audio buffer offset based on the router's current configuration
+K_AUDIO_BUFFER_OFFSET = K_GMEM_BASE_OFFSET + (t_router_channel * K_GMEM_PER_CHANNEL);
 
 
 /*==============================================================================
  == BLOCK SECTION
  =============================================================================*/
 @block
-// Calculate the gmem offset for the current router
-routerOffset = GMEM_BASE_OFFSET + (t_router_channel * GMEM_PER_CHANNEL);
-
 // Reset the sample counter
 sampleCount = 0;
 
 // Check if the current router is a sender or receiver
 (t_router_type == 0) ? (
-  // Current router is a sender so store the current timestamp in gmem
-  time_precise(gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)]);
+  // Current router is a sender so increment the timestamp in gmem
+  gmem[K_TIMESTAMP_CURRENT_OFFSET] += 1;
 ) : (
   // Current router is a receiver so check if the current timestamp is different
   // from the last timestamp
-  (gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)] != gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1]) ? (
+  (gmem[K_TIMESTAMP_CURRENT_OFFSET] != gmem[K_TIMESTAMP_LAST_OFFSET]) ? (
     // Timestamps are different so set the router output enabled flag and clear
     // the timeout threshold counter
     router_output_enabled = 1;
     sender_timeout_count  = 0;
 
     // Set the last timestamp as the current timestamp
-    gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2) + 1] = gmem[TIMESTAMP_BASE_OFFSET + (t_router_channel * 2)];
+    gmem[K_TIMESTAMP_LAST_OFFSET] = gmem[K_TIMESTAMP_CURRENT_OFFSET];
   ) : (
     // Timestamps are the same; check if the timeout counter has reached the
     // threshold value
-    (sender_timeout_count == TIMEOUT_THRESHOLD) ? (
+    (sender_timeout_count == K_TIMEOUT_THRESHOLD) ? (
       // Timeout has reached its threshold; clear the router output enabled flag
       router_output_enabled = 0;
     ) : (
@@ -256,15 +270,15 @@ sampleCount = 0;
     // Current router is a sender so check if sender is bypassed
     (t_send_bypass == 1) ? (
       // Sender is enabled so store the current sample in gmem
-      gmem[routerOffset + sampleCount]     = spl0;
-      gmem[routerOffset + sampleCount + 1] = spl1;
+      gmem[K_AUDIO_BUFFER_OFFSET + sampleCount]     = spl0;
+      gmem[K_AUDIO_BUFFER_OFFSET + sampleCount + 1] = spl1;
 
       // Increment the counter by 2 to move to the next gmem slot
       sampleCount += 2;
     ) : (
       // Sender is bypassed so store 0 samples in gmem
-      gmem[routerOffset + sampleCount]     = 0.0;
-      gmem[routerOffset + sampleCount + 1] = 0.0;
+      gmem[K_AUDIO_BUFFER_OFFSET + sampleCount]     = 0.0;
+      gmem[K_AUDIO_BUFFER_OFFSET + sampleCount + 1] = 0.0;
 
       // Increment the counter by 2 to move to the next gmem slot
       sampleCount += 2;
@@ -280,8 +294,8 @@ sampleCount = 0;
     // Current router is a receiver; check if the output is enabled
     ((router_output_enabled == 1) && (t_receive_out_enabled == 1)) ? (
       // Output is enabled so read the current sample from gmem
-      spl0 = gmem[routerOffset + sampleCount];
-      spl1 = gmem[routerOffset + sampleCount + 1];
+      spl0 = gmem[K_AUDIO_BUFFER_OFFSET + sampleCount];
+      spl1 = gmem[K_AUDIO_BUFFER_OFFSET + sampleCount + 1];
 
       // Increment the counter by 2 to move to the next gmem slot
       sampleCount += 2;
@@ -295,8 +309,8 @@ sampleCount = 0;
   // Router is disabled; check if it's a sender
   (t_router_type == 0) ? (
     // Router is a sender but disabled so store 0 samples in gmem
-    gmem[routerOffset + sampleCount]     = 0.0;
-    gmem[routerOffset + sampleCount + 1] = 0.0;
+    gmem[K_AUDIO_BUFFER_OFFSET + sampleCount]     = 0.0;
+    gmem[K_AUDIO_BUFFER_OFFSET + sampleCount + 1] = 0.0;
 
     // Increment the counter by 2 to move to the next gmem slot
     sampleCount += 2;
