@@ -26,7 +26,7 @@ desc: Audio Router
 
         Author: mmusik
 
-       Version: 0.1.?
+       Version: 0.1.2
 
    Description: Implements a simple gmem-based audio router that supports up to
                 16 sender/receiver pairs.
@@ -41,7 +41,7 @@ desc: Audio Router
            where receiver loops on a single sample block when sender is bypassed
            during playback. Adds controls to internally bypass sender and
            receiver output during playback without bypassing plugin.
-    0.1.?: Relocates gmem[] offset calculation to @slider section to eliminate
+    0.1.2: Relocates gmem[] offset calculation to @slider section to eliminate
            unnecessary arithmetic during each audio block. Simplifies heartbeat
            to use numerical counter. Refactors constant names for consistency
            and ease of debug.
@@ -50,43 +50,43 @@ desc: Audio Router
   gmem Mapping
   ------------
 
-    Offset | Name             | Description
-    =======|==================|=================================================
+    Offset | Name               | Description
+    =======|====================|===============================================
     16384  | K_GMEM_BASE_OFFSET | Base gmem offset for plugin.
-    16384  | PAIR_BUFFER_0    | Sender/receiver buffer for Router channel 0.
-    20480  | PAIR_BUFFER_1    | Sender/receiver buffer for Router channel 1.
-    24576  | PAIR_BUFFER_2    | Sender/receiver buffer for Router channel 2.
-    28672  | PAIR_BUFFER_3    | Sender/receiver buffer for Router channel 3.
-    32768  | PAIR_BUFFER_4    | Sender/receiver buffer for Router channel 4.
-    36864  | PAIR_BUFFER_5    | Sender/receiver buffer for Router channel 5.
-    40960  | PAIR_BUFFER_6    | Sender/receiver buffer for Router channel 6.
-    45056  | PAIR_BUFFER_7    | Sender/receiver buffer for Router channel 7.
-    49152  | PAIR_BUFFER_8    | Sender/receiver buffer for Router channel 8.
-    53248  | PAIR_BUFFER_9    | Sender/receiver buffer for Router channel 9.
-    57344  | PAIR_BUFFER_10   | Sender/receiver buffer for Router channel 10.
-    61440  | PAIR_BUFFER_11   | Sender/receiver buffer for Router channel 11.
-    65536  | PAIR_BUFFER_12   | Sender/receiver buffer for Router channel 12.
-    69632  | PAIR_BUFFER_13   | Sender/receiver buffer for Router channel 13.
-    73728  | PAIR_BUFFER_14   | Sender/receiver buffer for Router channel 14.
-    77824  | PAIR_BUFFER_15   | Sender/receiver buffer for Router channel 15.
-    81920  | TS_BASE_OFFSET   | Base gmem offset for heartbeat timestamps.
-    81920  | TS_BUFFER_0      | Current/last timestamp for Router channel 0.
-    81922  | TS_BUFFER_1      | Current/last timestamp for Router channel 1.
-    81924  | TS_BUFFER_2      | Current/last timestamp for Router channel 2.
-    81926  | TS_BUFFER_3      | Current/last timestamp for Router channel 3.
-    81928  | TS_BUFFER_4      | Current/last timestamp for Router channel 4.
-    81930  | TS_BUFFER_5      | Current/last timestamp for Router channel 5.
-    81932  | TS_BUFFER_6      | Current/last timestamp for Router channel 6.
-    81934  | TS_BUFFER_7      | Current/last timestamp for Router channel 7.
-    81936  | TS_BUFFER_8      | Current/last timestamp for Router channel 8.
-    81938  | TS_BUFFER_9      | Current/last timestamp for Router channel 9.
-    81940  | TS_BUFFER_10     | Current/last timestamp for Router channel 10.
-    81942  | TS_BUFFER_11     | Current/last timestamp for Router channel 11.
-    81944  | TS_BUFFER_12     | Current/last timestamp for Router channel 12.
-    81946  | TS_BUFFER_13     | Current/last timestamp for Router channel 13.
-    81948  | TS_BUFFER_14     | Current/last timestamp for Router channel 14.
-    81950  | TS_BUFFER_15     | Current/last timestamp for Router channel 15.
-    81951  | GMEM_END_OFFSET  | Final gmem offset used by plugin.
+    16384  | PAIR_BUFFER_0      | Sender/receiver buffer for Router channel 0.
+    20480  | PAIR_BUFFER_1      | Sender/receiver buffer for Router channel 1.
+    24576  | PAIR_BUFFER_2      | Sender/receiver buffer for Router channel 2.
+    28672  | PAIR_BUFFER_3      | Sender/receiver buffer for Router channel 3.
+    32768  | PAIR_BUFFER_4      | Sender/receiver buffer for Router channel 4.
+    36864  | PAIR_BUFFER_5      | Sender/receiver buffer for Router channel 5.
+    40960  | PAIR_BUFFER_6      | Sender/receiver buffer for Router channel 6.
+    45056  | PAIR_BUFFER_7      | Sender/receiver buffer for Router channel 7.
+    49152  | PAIR_BUFFER_8      | Sender/receiver buffer for Router channel 8.
+    53248  | PAIR_BUFFER_9      | Sender/receiver buffer for Router channel 9.
+    57344  | PAIR_BUFFER_10     | Sender/receiver buffer for Router channel 10.
+    61440  | PAIR_BUFFER_11     | Sender/receiver buffer for Router channel 11.
+    65536  | PAIR_BUFFER_12     | Sender/receiver buffer for Router channel 12.
+    69632  | PAIR_BUFFER_13     | Sender/receiver buffer for Router channel 13.
+    73728  | PAIR_BUFFER_14     | Sender/receiver buffer for Router channel 14.
+    77824  | PAIR_BUFFER_15     | Sender/receiver buffer for Router channel 15.
+    81920  | TS_BASE_OFFSET     | Base gmem offset for heartbeat timestamps.
+    81920  | TS_BUFFER_0        | Current/last timestamp for Router channel 0.
+    81922  | TS_BUFFER_1        | Current/last timestamp for Router channel 1.
+    81924  | TS_BUFFER_2        | Current/last timestamp for Router channel 2.
+    81926  | TS_BUFFER_3        | Current/last timestamp for Router channel 3.
+    81928  | TS_BUFFER_4        | Current/last timestamp for Router channel 4.
+    81930  | TS_BUFFER_5        | Current/last timestamp for Router channel 5.
+    81932  | TS_BUFFER_6        | Current/last timestamp for Router channel 6.
+    81934  | TS_BUFFER_7        | Current/last timestamp for Router channel 7.
+    81936  | TS_BUFFER_8        | Current/last timestamp for Router channel 8.
+    81938  | TS_BUFFER_9        | Current/last timestamp for Router channel 9.
+    81940  | TS_BUFFER_10       | Current/last timestamp for Router channel 10.
+    81942  | TS_BUFFER_11       | Current/last timestamp for Router channel 11.
+    81944  | TS_BUFFER_12       | Current/last timestamp for Router channel 12.
+    81946  | TS_BUFFER_13       | Current/last timestamp for Router channel 13.
+    81948  | TS_BUFFER_14       | Current/last timestamp for Router channel 14.
+    81950  | TS_BUFFER_15       | Current/last timestamp for Router channel 15.
+    81951  | GMEM_END_OFFSET    | Final gmem offset used by plugin.
   
 */
 
